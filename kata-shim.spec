@@ -4,7 +4,7 @@
 #
 Name     : kata-shim
 Version  : 1.1.0
-Release  : 5
+Release  : 6
 URL      : https://github.com/kata-containers/shim/archive/1.1.0.tar.gz
 Source0  : https://github.com/kata-containers/shim/archive/1.1.0.tar.gz
 Summary  : No detailed summary available
