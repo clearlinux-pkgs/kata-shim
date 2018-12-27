@@ -4,12 +4,13 @@
 #
 Name     : kata-shim
 Version  : 1.5.0.rc2
-Release  : 11
+Release  : 12
 URL      : https://github.com/kata-containers/shim/archive/1.5.0-rc2.tar.gz
 Source0  : https://github.com/kata-containers/shim/archive/1.5.0-rc2.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : Apache-2.0 BSD-2-Clause BSD-3-Clause GPL-2.0 ISC MIT MPL-2.0-no-copyleft-exception
+Requires: kata-shim-libexec = %{version}-%{release}
 Requires: kata-shim-license = %{version}-%{release}
 BuildRequires : buildreq-golang
 Patch1: 0001-add-fake-autogen.patch
@@ -17,6 +18,15 @@ Patch1: 0001-add-fake-autogen.patch
 %description
 [![Build Status](https://travis-ci.org/kata-containers/shim.svg?branch=master)](https://travis-ci.org/kata-containers/shim)
 [![codecov](https://codecov.io/gh/kata-containers/shim/branch/master/graph/badge.svg)](https://codecov.io/gh/kata-containers/shim)
+
+%package libexec
+Summary: libexec components for the kata-shim package.
+Group: Default
+Requires: kata-shim-license = %{version}-%{release}
+
+%description libexec
+libexec components for the kata-shim package.
+
 
 %package license
 Summary: license components for the kata-shim package.
@@ -35,7 +45,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1545442267
+export SOURCE_DATE_EPOCH=1545930045
 %autogen --disable-static ;export GOPATH="${PWD}/gopath/" \
 ;mkdir -p "${GOPATH}/src/github.com/kata-containers/" \
 ;ln -sf "${PWD}" "${GOPATH}/src/github.com/kata-containers/shim" \
@@ -43,7 +53,7 @@ export SOURCE_DATE_EPOCH=1545442267
 make  %{?_smp_mflags}
 
 %install
-export SOURCE_DATE_EPOCH=1545442267
+export SOURCE_DATE_EPOCH=1545930045
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/kata-shim
 cp LICENSE %{buildroot}/usr/share/package-licenses/kata-shim/LICENSE
@@ -86,11 +96,14 @@ cp vendor/golang.org/x/sys/LICENSE %{buildroot}/usr/share/package-licenses/kata-
 cp vendor/golang.org/x/text/LICENSE %{buildroot}/usr/share/package-licenses/kata-shim/vendor_golang.org_x_text_LICENSE
 cp vendor/google.golang.org/genproto/LICENSE %{buildroot}/usr/share/package-licenses/kata-shim/vendor_google.golang.org_genproto_LICENSE
 cp vendor/google.golang.org/grpc/LICENSE %{buildroot}/usr/share/package-licenses/kata-shim/vendor_google.golang.org_grpc_LICENSE
-%make_install LIBEXECDIR=%{buildroot}//usr/libexec/
+%make_install LIBEXECDIR=/usr/libexec/
 
 %files
 %defattr(-,root,root,-)
-/builddir/build/BUILDROOT/kata-shim-1.5.0.rc2-11.x86_64/usr/libexec/kata-containers/kata-shim
+
+%files libexec
+%defattr(-,root,root,-)
+/usr/libexec/kata-containers/kata-shim
 
 %files license
 %defattr(0644,root,root,0755)
