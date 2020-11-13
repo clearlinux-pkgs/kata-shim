@@ -1,0 +1,1072 @@
+From a43af866edcf2cd045177e05f698eb9d6f8af035 Mon Sep 17 00:00:00 2001
+From: Mark D Horn <mark.d.horn@intel.com>
+Date: Fri, 13 Nov 2020 10:26:44 -0800
+Subject: [PATCH] Switch to creack
+
+This Go module has moved to https://github.com/creack/pty.
+
+Need to patch creack/pty for this bug:
+https://github.com/creack/pty/issues/96
+
+Signed-off-by: Mark D Horn <mark.d.horn@intel.com>
+---
+ Gopkg.lock                                    |   6 +-
+ shim_test.go                                  |   2 +-
+ vendor/github.com/creack/pty/LICENSE          |  23 +++
+ vendor/github.com/creack/pty/README.md        | 100 +++++++++++++
+ vendor/github.com/{kr => creack}/pty/doc.go   |   0
+ vendor/github.com/{kr => creack}/pty/ioctl.go |   2 +-
+ .../{kr => creack}/pty/ioctl_bsd.go           |   0
+ vendor/github.com/creack/pty/ioctl_solaris.go |  30 ++++
+ .../{kr => creack}/pty/pty_darwin.go          |  12 +-
+ .../{kr => creack}/pty/pty_dragonfly.go       |  12 +-
+ .../{kr => creack}/pty/pty_freebsd.go         |  19 ++-
+ .../{kr => creack}/pty/pty_linux.go           |  11 +-
+ vendor/github.com/creack/pty/pty_openbsd.go   |  33 +++++
+ vendor/github.com/creack/pty/pty_solaris.go   | 139 ++++++++++++++++++
+ .../{kr => creack}/pty/pty_unsupported.go     |   2 +-
+ vendor/github.com/creack/pty/run.go           |  74 ++++++++++
+ vendor/github.com/{kr => creack}/pty/util.go  |  14 +-
+ vendor/github.com/creack/pty/util_solaris.go  |  51 +++++++
+ .../{kr => creack}/pty/ztypes_386.go          |   0
+ .../{kr => creack}/pty/ztypes_amd64.go        |   0
+ .../{kr => creack}/pty/ztypes_arm.go          |   0
+ .../{kr => creack}/pty/ztypes_arm64.go        |   0
+ .../pty/ztypes_dragonfly_amd64.go             |   0
+ .../{kr => creack}/pty/ztypes_freebsd_386.go  |   0
+ .../pty/ztypes_freebsd_amd64.go               |   0
+ .../{kr => creack}/pty/ztypes_freebsd_arm.go  |   0
+ .../creack/pty/ztypes_freebsd_arm64.go        |  13 ++
+ .../{kr => creack}/pty/ztypes_mipsx.go        |   0
+ .../creack/pty/ztypes_openbsd_386.go          |  13 ++
+ .../creack/pty/ztypes_openbsd_amd64.go        |  13 ++
+ .../{kr => creack}/pty/ztypes_ppc64.go        |   0
+ .../{kr => creack}/pty/ztypes_ppc64le.go      |   0
+ vendor/github.com/creack/pty/ztypes_riscvx.go |  11 ++
+ .../{kr => creack}/pty/ztypes_s390x.go        |   0
+ vendor/github.com/kr/pty/run.go               |  34 -----
+ vendor/github.com/kr/pty/types.go             |  10 --
+ vendor/github.com/kr/pty/types_dragonfly.go   |  17 ---
+ vendor/github.com/kr/pty/types_freebsd.go     |  15 --
+ 38 files changed, 548 insertions(+), 108 deletions(-)
+ create mode 100644 vendor/github.com/creack/pty/LICENSE
+ create mode 100644 vendor/github.com/creack/pty/README.md
+ rename vendor/github.com/{kr => creack}/pty/doc.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ioctl.go (86%)
+ rename vendor/github.com/{kr => creack}/pty/ioctl_bsd.go (100%)
+ create mode 100644 vendor/github.com/creack/pty/ioctl_solaris.go
+ rename vendor/github.com/{kr => creack}/pty/pty_darwin.go (82%)
+ rename vendor/github.com/{kr => creack}/pty/pty_dragonfly.go (86%)
+ rename vendor/github.com/{kr => creack}/pty/pty_freebsd.go (72%)
+ rename vendor/github.com/{kr => creack}/pty/pty_linux.go (75%)
+ create mode 100644 vendor/github.com/creack/pty/pty_openbsd.go
+ create mode 100644 vendor/github.com/creack/pty/pty_solaris.go
+ rename vendor/github.com/{kr => creack}/pty/pty_unsupported.go (64%)
+ create mode 100644 vendor/github.com/creack/pty/run.go
+ rename vendor/github.com/{kr => creack}/pty/util.go (81%)
+ create mode 100644 vendor/github.com/creack/pty/util_solaris.go
+ rename vendor/github.com/{kr => creack}/pty/ztypes_386.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ztypes_amd64.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ztypes_arm.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ztypes_arm64.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ztypes_dragonfly_amd64.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ztypes_freebsd_386.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ztypes_freebsd_amd64.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ztypes_freebsd_arm.go (100%)
+ create mode 100644 vendor/github.com/creack/pty/ztypes_freebsd_arm64.go
+ rename vendor/github.com/{kr => creack}/pty/ztypes_mipsx.go (100%)
+ create mode 100644 vendor/github.com/creack/pty/ztypes_openbsd_386.go
+ create mode 100644 vendor/github.com/creack/pty/ztypes_openbsd_amd64.go
+ rename vendor/github.com/{kr => creack}/pty/ztypes_ppc64.go (100%)
+ rename vendor/github.com/{kr => creack}/pty/ztypes_ppc64le.go (100%)
+ create mode 100644 vendor/github.com/creack/pty/ztypes_riscvx.go
+ rename vendor/github.com/{kr => creack}/pty/ztypes_s390x.go (100%)
+ delete mode 100644 vendor/github.com/kr/pty/run.go
+ delete mode 100644 vendor/github.com/kr/pty/types.go
+ delete mode 100644 vendor/github.com/kr/pty/types_dragonfly.go
+ delete mode 100644 vendor/github.com/kr/pty/types_freebsd.go
+
+diff --git a/Gopkg.lock b/Gopkg.lock
+index 7994ad1d7ff4..1c57ebf72cef 100644
+--- a/Gopkg.lock
++++ b/Gopkg.lock
+@@ -91,12 +91,10 @@
+   revision = "32c87e75c2e4c014961f104c3c59b87f2aee3384"
+ 
+ [[projects]]
+-  digest = "1:f0491ec759a06331ed36c81e8b0846058a36b4ae9d9b8ca4a60c46d223e4fcea"
+-  name = "github.com/kr/pty"
++  name = "github.com/creack/pty"
+   packages = ["."]
+   pruneopts = "NT"
+-  revision = "1278f20d9cf7455f0465f3bf74a73d1eeb555c0f"
+-  version = "v1.1.0"
++  version = "v1.1.10"
+ 
+ [[projects]]
+   digest = "1:9630e5b3b78bbd223cf527ad8f593f7babd482e66050d88aa5a03a7d32755a5d"
+diff --git a/shim_test.go b/shim_test.go
+index 9b68555d57ea..27d804cde5b0 100644
+--- a/shim_test.go
++++ b/shim_test.go
+@@ -12,7 +12,7 @@ import (
+ 	"sync"
+ 	"testing"
+ 
+-	"github.com/kr/pty"
++	"github.com/creack/pty"
+ 	"github.com/stretchr/testify/assert"
+ )
+ 
+diff --git a/vendor/github.com/creack/pty/LICENSE b/vendor/github.com/creack/pty/LICENSE
+new file mode 100644
+index 000000000000..6b7558b6b421
+--- /dev/null
++++ b/vendor/github.com/creack/pty/LICENSE
+@@ -0,0 +1,23 @@
++Copyright (c) 2011 Keith Rarick
++
++Permission is hereby granted, free of charge, to any person
++obtaining a copy of this software and associated
++documentation files (the "Software"), to deal in the
++Software without restriction, including without limitation
++the rights to use, copy, modify, merge, publish, distribute,
++sublicense, and/or sell copies of the Software, and to
++permit persons to whom the Software is furnished to do so,
++subject to the following conditions:
++
++The above copyright notice and this permission notice shall
++be included in all copies or substantial portions of the
++Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
++KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
++WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
++PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
++OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
++OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
++OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
++SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+diff --git a/vendor/github.com/creack/pty/README.md b/vendor/github.com/creack/pty/README.md
+new file mode 100644
+index 000000000000..5275014a7a71
+--- /dev/null
++++ b/vendor/github.com/creack/pty/README.md
+@@ -0,0 +1,100 @@
++# pty
++
++Pty is a Go package for using unix pseudo-terminals.
++
++## Install
++
++    go get github.com/creack/pty
++
++## Example
++
++### Command
++
++```go
++package main
++
++import (
++	"github.com/creack/pty"
++	"io"
++	"os"
++	"os/exec"
++)
++
++func main() {
++	c := exec.Command("grep", "--color=auto", "bar")
++	f, err := pty.Start(c)
++	if err != nil {
++		panic(err)
++	}
++
++	go func() {
++		f.Write([]byte("foo\n"))
++		f.Write([]byte("bar\n"))
++		f.Write([]byte("baz\n"))
++		f.Write([]byte{4}) // EOT
++	}()
++	io.Copy(os.Stdout, f)
++}
++```
++
++### Shell
++
++```go
++package main
++
++import (
++        "io"
++        "log"
++        "os"
++        "os/exec"
++        "os/signal"
++        "syscall"
++
++        "github.com/creack/pty"
++        "golang.org/x/crypto/ssh/terminal"
++)
++
++func test() error {
++        // Create arbitrary command.
++        c := exec.Command("bash")
++
++        // Start the command with a pty.
++        ptmx, err := pty.Start(c)
++        if err != nil {
++                return err
++        }
++        // Make sure to close the pty at the end.
++        defer func() { _ = ptmx.Close() }() // Best effort.
++
++        // Handle pty size.
++        ch := make(chan os.Signal, 1)
++        signal.Notify(ch, syscall.SIGWINCH)
++        go func() {
++                for range ch {
++                        if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
++                                log.Printf("error resizing pty: %s", err)
++                        }
++                }
++        }()
++        ch <- syscall.SIGWINCH // Initial resize.
++
++        // Set stdin in raw mode.
++        oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
++        if err != nil {
++                panic(err)
++        }
++        defer func() { _ = terminal.Restore(int(os.Stdin.Fd()), oldState) }() // Best effort.
++
++        // Copy stdin to the pty and the pty to stdout.
++        go func() { _, _ = io.Copy(ptmx, os.Stdin) }()
++        _, _ = io.Copy(os.Stdout, ptmx)
++
++        return nil
++}
++
++func main() {
++        if err := test(); err != nil {
++                log.Fatal(err)
++        }
++}
++```
+diff --git a/vendor/github.com/kr/pty/doc.go b/vendor/github.com/creack/pty/doc.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/doc.go
+rename to vendor/github.com/creack/pty/doc.go
+diff --git a/vendor/github.com/kr/pty/ioctl.go b/vendor/github.com/creack/pty/ioctl.go
+similarity index 86%
+rename from vendor/github.com/kr/pty/ioctl.go
+rename to vendor/github.com/creack/pty/ioctl.go
+index c57c19e7e25b..c85cdcd14a01 100644
+--- a/vendor/github.com/kr/pty/ioctl.go
++++ b/vendor/github.com/creack/pty/ioctl.go
+@@ -1,4 +1,4 @@
+-// +build !windows
++// +build !windows,!solaris
+ 
+ package pty
+ 
+diff --git a/vendor/github.com/kr/pty/ioctl_bsd.go b/vendor/github.com/creack/pty/ioctl_bsd.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ioctl_bsd.go
+rename to vendor/github.com/creack/pty/ioctl_bsd.go
+diff --git a/vendor/github.com/creack/pty/ioctl_solaris.go b/vendor/github.com/creack/pty/ioctl_solaris.go
+new file mode 100644
+index 000000000000..f63985f34ce3
+--- /dev/null
++++ b/vendor/github.com/creack/pty/ioctl_solaris.go
+@@ -0,0 +1,30 @@
++package pty
++
++import (
++	"golang.org/x/sys/unix"
++	"unsafe"
++)
++
++const (
++	// see /usr/include/sys/stropts.h
++	I_PUSH  = uintptr((int32('S')<<8 | 002))
++	I_STR   = uintptr((int32('S')<<8 | 010))
++	I_FIND  = uintptr((int32('S')<<8 | 013))
++	// see /usr/include/sys/ptms.h
++	ISPTM   = (int32('P') << 8) | 1
++	UNLKPT  = (int32('P') << 8) | 2
++	PTSSTTY = (int32('P') << 8) | 3
++	ZONEPT  = (int32('P') << 8) | 4
++	OWNERPT = (int32('P') << 8) | 5
++)
++
++type strioctl struct {
++	ic_cmd    int32
++	ic_timout int32
++	ic_len    int32
++	ic_dp     unsafe.Pointer
++}
++
++func ioctl(fd, cmd, ptr uintptr) error {
++	return unix.IoctlSetInt(int(fd), uint(cmd), int(ptr))
++}
+diff --git a/vendor/github.com/kr/pty/pty_darwin.go b/vendor/github.com/creack/pty/pty_darwin.go
+similarity index 82%
+rename from vendor/github.com/kr/pty/pty_darwin.go
+rename to vendor/github.com/creack/pty/pty_darwin.go
+index 93415430d273..6344b6b0efb6 100644
+--- a/vendor/github.com/kr/pty/pty_darwin.go
++++ b/vendor/github.com/creack/pty/pty_darwin.go
+@@ -13,19 +13,23 @@ func open() (pty, tty *os.File, err error) {
+ 		return nil, nil, err
+ 	}
+ 	p := os.NewFile(uintptr(pFD), "/dev/ptmx")
++	// In case of error after this point, make sure we close the ptmx fd.
++	defer func() {
++		if err != nil {
++			_ = p.Close() // Best effort.
++		}
++	}()
+ 
+ 	sname, err := ptsname(p)
+ 	if err != nil {
+ 		return nil, nil, err
+ 	}
+ 
+-	err = grantpt(p)
+-	if err != nil {
++	if err := grantpt(p); err != nil {
+ 		return nil, nil, err
+ 	}
+ 
+-	err = unlockpt(p)
+-	if err != nil {
++	if err := unlockpt(p); err != nil {
+ 		return nil, nil, err
+ 	}
+ 
+diff --git a/vendor/github.com/kr/pty/pty_dragonfly.go b/vendor/github.com/creack/pty/pty_dragonfly.go
+similarity index 86%
+rename from vendor/github.com/kr/pty/pty_dragonfly.go
+rename to vendor/github.com/creack/pty/pty_dragonfly.go
+index 5431fb5aec97..b7d1f20f29e5 100644
+--- a/vendor/github.com/kr/pty/pty_dragonfly.go
++++ b/vendor/github.com/creack/pty/pty_dragonfly.go
+@@ -14,19 +14,23 @@ func open() (pty, tty *os.File, err error) {
+ 	if err != nil {
+ 		return nil, nil, err
+ 	}
++	// In case of error after this point, make sure we close the ptmx fd.
++	defer func() {
++		if err != nil {
++			_ = p.Close() // Best effort.
++		}
++	}()
+ 
+ 	sname, err := ptsname(p)
+ 	if err != nil {
+ 		return nil, nil, err
+ 	}
+ 
+-	err = grantpt(p)
+-	if err != nil {
++	if err := grantpt(p); err != nil {
+ 		return nil, nil, err
+ 	}
+ 
+-	err = unlockpt(p)
+-	if err != nil {
++	if err := unlockpt(p); err != nil {
+ 		return nil, nil, err
+ 	}
+ 
+diff --git a/vendor/github.com/kr/pty/pty_freebsd.go b/vendor/github.com/creack/pty/pty_freebsd.go
+similarity index 72%
+rename from vendor/github.com/kr/pty/pty_freebsd.go
+rename to vendor/github.com/creack/pty/pty_freebsd.go
+index b341babd054b..63b6d91337ae 100644
+--- a/vendor/github.com/kr/pty/pty_freebsd.go
++++ b/vendor/github.com/creack/pty/pty_freebsd.go
+@@ -7,22 +7,28 @@ import (
+ 	"unsafe"
+ )
+ 
+-func posix_openpt(oflag int) (fd int, err error) {
++func posixOpenpt(oflag int) (fd int, err error) {
+ 	r0, _, e1 := syscall.Syscall(syscall.SYS_POSIX_OPENPT, uintptr(oflag), 0, 0)
+ 	fd = int(r0)
+ 	if e1 != 0 {
+ 		err = e1
+ 	}
+-	return
++	return fd, err
+ }
+ 
+ func open() (pty, tty *os.File, err error) {
+-	fd, err := posix_openpt(syscall.O_RDWR | syscall.O_CLOEXEC)
++	fd, err := posixOpenpt(syscall.O_RDWR | syscall.O_CLOEXEC)
+ 	if err != nil {
+ 		return nil, nil, err
+ 	}
+-
+ 	p := os.NewFile(uintptr(fd), "/dev/pts")
++	// In case of error after this point, make sure we close the pts fd.
++	defer func() {
++		if err != nil {
++			_ = p.Close() // Best effort.
++		}
++	}()
++
+ 	sname, err := ptsname(p)
+ 	if err != nil {
+ 		return nil, nil, err
+@@ -42,7 +48,7 @@ func isptmaster(fd uintptr) (bool, error) {
+ 
+ var (
+ 	emptyFiodgnameArg fiodgnameArg
+-	ioctl_FIODGNAME   = _IOW('f', 120, unsafe.Sizeof(emptyFiodgnameArg))
++	ioctlFIODGNAME    = _IOW('f', 120, unsafe.Sizeof(emptyFiodgnameArg))
+ )
+ 
+ func ptsname(f *os.File) (string, error) {
+@@ -59,8 +65,7 @@ func ptsname(f *os.File) (string, error) {
+ 		buf = make([]byte, n)
+ 		arg = fiodgnameArg{Len: n, Buf: (*byte)(unsafe.Pointer(&buf[0]))}
+ 	)
+-	err = ioctl(f.Fd(), ioctl_FIODGNAME, uintptr(unsafe.Pointer(&arg)))
+-	if err != nil {
++	if err := ioctl(f.Fd(), ioctlFIODGNAME, uintptr(unsafe.Pointer(&arg))); err != nil {
+ 		return "", err
+ 	}
+ 
+diff --git a/vendor/github.com/kr/pty/pty_linux.go b/vendor/github.com/creack/pty/pty_linux.go
+similarity index 75%
+rename from vendor/github.com/kr/pty/pty_linux.go
+rename to vendor/github.com/creack/pty/pty_linux.go
+index cb901a21e006..4a833de18499 100644
+--- a/vendor/github.com/kr/pty/pty_linux.go
++++ b/vendor/github.com/creack/pty/pty_linux.go
+@@ -12,14 +12,19 @@ func open() (pty, tty *os.File, err error) {
+ 	if err != nil {
+ 		return nil, nil, err
+ 	}
++	// In case of error after this point, make sure we close the ptmx fd.
++	defer func() {
++		if err != nil {
++			_ = p.Close() // Best effort.
++		}
++	}()
+ 
+ 	sname, err := ptsname(p)
+ 	if err != nil {
+ 		return nil, nil, err
+ 	}
+ 
+-	err = unlockpt(p)
+-	if err != nil {
++	if err := unlockpt(p); err != nil {
+ 		return nil, nil, err
+ 	}
+ 
+@@ -41,6 +46,6 @@ func ptsname(f *os.File) (string, error) {
+ 
+ func unlockpt(f *os.File) error {
+ 	var u _C_int
+-	// use TIOCSPTLCK with a zero valued arg to clear the slave pty lock
++	// use TIOCSPTLCK with a pointer to zero to clear the lock
+ 	return ioctl(f.Fd(), syscall.TIOCSPTLCK, uintptr(unsafe.Pointer(&u)))
+ }
+diff --git a/vendor/github.com/creack/pty/pty_openbsd.go b/vendor/github.com/creack/pty/pty_openbsd.go
+new file mode 100644
+index 000000000000..a6a35d1e677e
+--- /dev/null
++++ b/vendor/github.com/creack/pty/pty_openbsd.go
+@@ -0,0 +1,33 @@
++package pty
++
++import (
++	"os"
++	"syscall"
++	"unsafe"
++)
++
++func open() (pty, tty *os.File, err error) {
++	/*
++	 * from ptm(4):
++	 * The PTMGET command allocates a free pseudo terminal, changes its
++	 * ownership to the caller, revokes the access privileges for all previous
++	 * users, opens the file descriptors for the pty and tty devices and
++	 * returns them to the caller in struct ptmget.
++	 */
++
++	p, err := os.OpenFile("/dev/ptm", os.O_RDWR|syscall.O_CLOEXEC, 0)
++	if err != nil {
++		return nil, nil, err
++	}
++	defer p.Close()
++
++	var ptm ptmget
++	if err := ioctl(p.Fd(), uintptr(ioctl_PTMGET), uintptr(unsafe.Pointer(&ptm))); err != nil {
++		return nil, nil, err
++	}
++
++	pty = os.NewFile(uintptr(ptm.Cfd), "/dev/ptm")
++	tty = os.NewFile(uintptr(ptm.Sfd), "/dev/ptm")
++
++	return pty, tty, nil
++}
+diff --git a/vendor/github.com/creack/pty/pty_solaris.go b/vendor/github.com/creack/pty/pty_solaris.go
+new file mode 100644
+index 000000000000..09ec1b7978a6
+--- /dev/null
++++ b/vendor/github.com/creack/pty/pty_solaris.go
+@@ -0,0 +1,139 @@
++package pty
++
++/* based on:
++http://src.illumos.org/source/xref/illumos-gate/usr/src/lib/libc/port/gen/pt.c
++*/
++
++import (
++	"errors"
++	"golang.org/x/sys/unix"
++	"os"
++	"strconv"
++	"syscall"
++	"unsafe"
++)
++
++const NODEV = ^uint64(0)
++
++func open() (pty, tty *os.File, err error) {
++	masterfd, err := syscall.Open("/dev/ptmx", syscall.O_RDWR|unix.O_NOCTTY, 0)
++	//masterfd, err := syscall.Open("/dev/ptmx", syscall.O_RDWR|syscall.O_CLOEXEC|unix.O_NOCTTY, 0)
++	if err != nil {
++		return nil, nil, err
++	}
++	p := os.NewFile(uintptr(masterfd), "/dev/ptmx")
++
++	sname, err := ptsname(p)
++	if err != nil {
++		return nil, nil, err
++	}
++
++	err = grantpt(p)
++	if err != nil {
++		return nil, nil, err
++	}
++
++	err = unlockpt(p)
++	if err != nil {
++		return nil, nil, err
++	}
++
++	slavefd, err := syscall.Open(sname, os.O_RDWR|unix.O_NOCTTY, 0)
++	if err != nil {
++		return nil, nil, err
++	}
++	t := os.NewFile(uintptr(slavefd), sname)
++
++	// pushing terminal driver STREAMS modules as per pts(7)
++	for _, mod := range([]string{"ptem", "ldterm", "ttcompat"}) {
++		err = streams_push(t, mod)
++		if err != nil {
++			return nil, nil, err
++		}
++	}
++	
++	return p, t, nil
++}
++
++func minor(x uint64) uint64 {
++	return x & 0377
++}
++
++func ptsdev(fd uintptr) uint64 {
++	istr := strioctl{ISPTM, 0, 0, nil}
++	err := ioctl(fd, I_STR, uintptr(unsafe.Pointer(&istr)))
++	if err != nil {
++		return NODEV
++	}
++	var status unix.Stat_t
++	err = unix.Fstat(int(fd), &status)
++	if err != nil {
++		return NODEV
++	}
++	return uint64(minor(status.Rdev))
++}
++
++func ptsname(f *os.File) (string, error) {
++	dev := ptsdev(f.Fd())
++	if dev == NODEV {
++		return "", errors.New("not a master pty")
++	}
++	fn := "/dev/pts/" + strconv.FormatInt(int64(dev), 10)
++	// access(2) creates the slave device (if the pty exists)
++	// F_OK == 0 (unistd.h)
++	err := unix.Access(fn, 0)
++	if err != nil {
++		return "", err
++	}
++	return fn, nil
++}
++
++type pt_own struct {
++	pto_ruid int32
++	pto_rgid int32
++}
++
++func grantpt(f *os.File) error {
++	if ptsdev(f.Fd()) == NODEV {
++		return errors.New("not a master pty")
++	}
++	var pto pt_own
++	pto.pto_ruid = int32(os.Getuid())
++	// XXX should first attempt to get gid of DEFAULT_TTY_GROUP="tty"
++	pto.pto_rgid = int32(os.Getgid())
++	var istr strioctl
++	istr.ic_cmd = OWNERPT
++	istr.ic_timout = 0
++	istr.ic_len = int32(unsafe.Sizeof(istr))
++	istr.ic_dp = unsafe.Pointer(&pto)
++	err := ioctl(f.Fd(), I_STR, uintptr(unsafe.Pointer(&istr)))
++	if err != nil {
++		return errors.New("access denied")
++	}
++	return nil
++}
++
++func unlockpt(f *os.File) error {
++	istr := strioctl{UNLKPT, 0, 0, nil}
++	return ioctl(f.Fd(), I_STR, uintptr(unsafe.Pointer(&istr)))
++}
++
++// push STREAMS modules if not already done so
++func streams_push(f *os.File, mod string) error {
++	var err error
++	buf := []byte(mod)
++	// XXX I_FIND is not returning an error when the module
++	// is already pushed even though truss reports a return
++	// value of 1. A bug in the Go Solaris syscall interface?
++	// XXX without this we are at risk of the issue
++	// https://www.illumos.org/issues/9042
++	// but since we are not using libc or XPG4.2, we should not be
++	// double-pushing modules
++	
++	err = ioctl(f.Fd(), I_FIND, uintptr(unsafe.Pointer(&buf[0])))
++	if err != nil {
++		return nil
++	}
++	err = ioctl(f.Fd(), I_PUSH, uintptr(unsafe.Pointer(&buf[0])))
++	return err
++}
+diff --git a/vendor/github.com/kr/pty/pty_unsupported.go b/vendor/github.com/creack/pty/pty_unsupported.go
+similarity index 64%
+rename from vendor/github.com/kr/pty/pty_unsupported.go
+rename to vendor/github.com/creack/pty/pty_unsupported.go
+index bd3d1e7e0e6f..ceb425b19c98 100644
+--- a/vendor/github.com/kr/pty/pty_unsupported.go
++++ b/vendor/github.com/creack/pty/pty_unsupported.go
+@@ -1,4 +1,4 @@
+-// +build !linux,!darwin,!freebsd,!dragonfly
++// +build !linux,!darwin,!freebsd,!dragonfly,!openbsd,!solaris
+ 
+ package pty
+ 
+diff --git a/vendor/github.com/creack/pty/run.go b/vendor/github.com/creack/pty/run.go
+new file mode 100644
+index 000000000000..b07942514d6a
+--- /dev/null
++++ b/vendor/github.com/creack/pty/run.go
+@@ -0,0 +1,74 @@
++// +build !windows
++
++package pty
++
++import (
++	"os"
++	"os/exec"
++	"syscall"
++)
++
++// Start assigns a pseudo-terminal tty os.File to c.Stdin, c.Stdout,
++// and c.Stderr, calls c.Start, and returns the File of the tty's
++// corresponding pty.
++//
++// Starts the process in a new session and sets the controlling terminal.
++func Start(c *exec.Cmd) (pty *os.File, err error) {
++	return StartWithSize(c, nil)
++}
++
++// StartWithSize assigns a pseudo-terminal tty os.File to c.Stdin, c.Stdout,
++// and c.Stderr, calls c.Start, and returns the File of the tty's
++// corresponding pty.
++//
++// This will resize the pty to the specified size before starting the command.
++// Starts the process in a new session and sets the controlling terminal.
++func StartWithSize(c *exec.Cmd, sz *Winsize) (pty *os.File, err error) {
++	if c.SysProcAttr == nil {
++		c.SysProcAttr = &syscall.SysProcAttr{}
++	}
++	c.SysProcAttr.Setsid = true
++	c.SysProcAttr.Setctty = true
++	return StartWithAttrs(c, sz, c.SysProcAttr)
++}
++
++// StartWithAttrs assigns a pseudo-terminal tty os.File to c.Stdin, c.Stdout,
++// and c.Stderr, calls c.Start, and returns the File of the tty's
++// corresponding pty.
++//
++// This will resize the pty to the specified size before starting the command if a size is provided.
++// The `attrs` parameter overrides the one set in c.SysProcAttr.
++//
++// This should generally not be needed. Used in some edge cases where it is needed to create a pty
++// without a controlling terminal.
++func StartWithAttrs(c *exec.Cmd, sz *Winsize, attrs *syscall.SysProcAttr) (pty *os.File, err error) {
++	pty, tty, err := Open()
++	if err != nil {
++		return nil, err
++	}
++	defer tty.Close()
++
++	if sz != nil {
++		if err := Setsize(pty, sz); err != nil {
++			pty.Close()
++			return nil, err
++		}
++	}
++	if c.Stdout == nil {
++		c.Stdout = tty
++	}
++	if c.Stderr == nil {
++		c.Stderr = tty
++	}
++	if c.Stdin == nil {
++		c.Stdin = tty
++	}
++
++	c.SysProcAttr = attrs
++
++	if err := c.Start(); err != nil {
++		_ = pty.Close()
++		return nil, err
++	}
++	return pty, err
++}
+diff --git a/vendor/github.com/kr/pty/util.go b/vendor/github.com/creack/pty/util.go
+similarity index 81%
+rename from vendor/github.com/kr/pty/util.go
+rename to vendor/github.com/creack/pty/util.go
+index 68a8584cfeb8..8fdde0bab988 100644
+--- a/vendor/github.com/kr/pty/util.go
++++ b/vendor/github.com/creack/pty/util.go
+@@ -1,4 +1,4 @@
+-// +build !windows
++// +build !windows,!solaris
+ 
+ package pty
+ 
+@@ -8,15 +8,15 @@ import (
+ 	"unsafe"
+ )
+ 
+-// InheritSize applies the terminal size of master to slave. This should be run
+-// in a signal handler for syscall.SIGWINCH to automatically resize the slave when
+-// the master receives a window size change notification.
+-func InheritSize(master, slave *os.File) error {
+-	size, err := GetsizeFull(master)
++// InheritSize applies the terminal size of pty to tty. This should be run
++// in a signal handler for syscall.SIGWINCH to automatically resize the tty when
++// the pty receives a window size change notification.
++func InheritSize(pty, tty *os.File) error {
++	size, err := GetsizeFull(pty)
+ 	if err != nil {
+ 		return err
+ 	}
+-	err = Setsize(slave, size)
++	err = Setsize(tty, size)
+ 	if err != nil {
+ 		return err
+ 	}
+diff --git a/vendor/github.com/creack/pty/util_solaris.go b/vendor/github.com/creack/pty/util_solaris.go
+new file mode 100644
+index 000000000000..e8896924824b
+--- /dev/null
++++ b/vendor/github.com/creack/pty/util_solaris.go
+@@ -0,0 +1,51 @@
++//
++
++package pty
++
++import (
++	"os"
++	"golang.org/x/sys/unix"
++)
++
++const (
++	TIOCGWINSZ = 21608 // 'T' << 8 | 104
++	TIOCSWINSZ = 21607 // 'T' << 8 | 103
++)
++
++// Winsize describes the terminal size.
++type Winsize struct {
++	Rows uint16 // ws_row: Number of rows (in cells)
++	Cols uint16 // ws_col: Number of columns (in cells)
++	X    uint16 // ws_xpixel: Width in pixels
++	Y    uint16 // ws_ypixel: Height in pixels
++}
++
++// GetsizeFull returns the full terminal size description.
++func GetsizeFull(t *os.File) (size *Winsize, err error) {
++	var wsz *unix.Winsize
++	wsz, err = unix.IoctlGetWinsize(int(t.Fd()), TIOCGWINSZ)
++
++	if err != nil {
++		return nil, err
++	} else {
++		return &Winsize{wsz.Row, wsz.Col, wsz.Xpixel, wsz.Ypixel}, nil
++	}
++}
++
++// Get Windows Size
++func Getsize(t *os.File) (rows, cols int, err error) {
++	var wsz *unix.Winsize
++	wsz, err = unix.IoctlGetWinsize(int(t.Fd()), TIOCGWINSZ)
++
++	if err != nil {
++		return 80, 25, err
++	} else {
++		return int(wsz.Row), int(wsz.Col), nil
++	}
++}
++
++// Setsize resizes t to s.
++func Setsize(t *os.File, ws *Winsize) error {
++	wsz := unix.Winsize{ws.Rows, ws.Cols, ws.X, ws.Y}
++	return unix.IoctlSetWinsize(int(t.Fd()), TIOCSWINSZ, &wsz)
++}
+diff --git a/vendor/github.com/kr/pty/ztypes_386.go b/vendor/github.com/creack/pty/ztypes_386.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_386.go
+rename to vendor/github.com/creack/pty/ztypes_386.go
+diff --git a/vendor/github.com/kr/pty/ztypes_amd64.go b/vendor/github.com/creack/pty/ztypes_amd64.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_amd64.go
+rename to vendor/github.com/creack/pty/ztypes_amd64.go
+diff --git a/vendor/github.com/kr/pty/ztypes_arm.go b/vendor/github.com/creack/pty/ztypes_arm.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_arm.go
+rename to vendor/github.com/creack/pty/ztypes_arm.go
+diff --git a/vendor/github.com/kr/pty/ztypes_arm64.go b/vendor/github.com/creack/pty/ztypes_arm64.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_arm64.go
+rename to vendor/github.com/creack/pty/ztypes_arm64.go
+diff --git a/vendor/github.com/kr/pty/ztypes_dragonfly_amd64.go b/vendor/github.com/creack/pty/ztypes_dragonfly_amd64.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_dragonfly_amd64.go
+rename to vendor/github.com/creack/pty/ztypes_dragonfly_amd64.go
+diff --git a/vendor/github.com/kr/pty/ztypes_freebsd_386.go b/vendor/github.com/creack/pty/ztypes_freebsd_386.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_freebsd_386.go
+rename to vendor/github.com/creack/pty/ztypes_freebsd_386.go
+diff --git a/vendor/github.com/kr/pty/ztypes_freebsd_amd64.go b/vendor/github.com/creack/pty/ztypes_freebsd_amd64.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_freebsd_amd64.go
+rename to vendor/github.com/creack/pty/ztypes_freebsd_amd64.go
+diff --git a/vendor/github.com/kr/pty/ztypes_freebsd_arm.go b/vendor/github.com/creack/pty/ztypes_freebsd_arm.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_freebsd_arm.go
+rename to vendor/github.com/creack/pty/ztypes_freebsd_arm.go
+diff --git a/vendor/github.com/creack/pty/ztypes_freebsd_arm64.go b/vendor/github.com/creack/pty/ztypes_freebsd_arm64.go
+new file mode 100644
+index 000000000000..4418139b26fd
+--- /dev/null
++++ b/vendor/github.com/creack/pty/ztypes_freebsd_arm64.go
+@@ -0,0 +1,13 @@
++// Code generated by cmd/cgo -godefs; DO NOT EDIT.
++// cgo -godefs types_freebsd.go
++
++package pty
++
++const (
++	_C_SPECNAMELEN = 0xff
++)
++
++type fiodgnameArg struct {
++	Len int32
++	Buf *byte
++}
+diff --git a/vendor/github.com/kr/pty/ztypes_mipsx.go b/vendor/github.com/creack/pty/ztypes_mipsx.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_mipsx.go
+rename to vendor/github.com/creack/pty/ztypes_mipsx.go
+diff --git a/vendor/github.com/creack/pty/ztypes_openbsd_386.go b/vendor/github.com/creack/pty/ztypes_openbsd_386.go
+new file mode 100644
+index 000000000000..ccb3aab9ae9c
+--- /dev/null
++++ b/vendor/github.com/creack/pty/ztypes_openbsd_386.go
+@@ -0,0 +1,13 @@
++// Created by cgo -godefs - DO NOT EDIT
++// cgo -godefs types_openbsd.go
++
++package pty
++
++type ptmget struct {
++	Cfd	int32
++	Sfd	int32
++	Cn	[16]int8
++	Sn	[16]int8
++}
++
++var ioctl_PTMGET = 0x40287401
+diff --git a/vendor/github.com/creack/pty/ztypes_openbsd_amd64.go b/vendor/github.com/creack/pty/ztypes_openbsd_amd64.go
+new file mode 100644
+index 000000000000..e67051688f00
+--- /dev/null
++++ b/vendor/github.com/creack/pty/ztypes_openbsd_amd64.go
+@@ -0,0 +1,13 @@
++// Created by cgo -godefs - DO NOT EDIT
++// cgo -godefs types_openbsd.go
++
++package pty
++
++type ptmget struct {
++	Cfd int32
++	Sfd int32
++	Cn  [16]int8
++	Sn  [16]int8
++}
++
++var ioctl_PTMGET = 0x40287401
+diff --git a/vendor/github.com/kr/pty/ztypes_ppc64.go b/vendor/github.com/creack/pty/ztypes_ppc64.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_ppc64.go
+rename to vendor/github.com/creack/pty/ztypes_ppc64.go
+diff --git a/vendor/github.com/kr/pty/ztypes_ppc64le.go b/vendor/github.com/creack/pty/ztypes_ppc64le.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_ppc64le.go
+rename to vendor/github.com/creack/pty/ztypes_ppc64le.go
+diff --git a/vendor/github.com/creack/pty/ztypes_riscvx.go b/vendor/github.com/creack/pty/ztypes_riscvx.go
+new file mode 100644
+index 000000000000..99eec8ecbe02
+--- /dev/null
++++ b/vendor/github.com/creack/pty/ztypes_riscvx.go
+@@ -0,0 +1,11 @@
++// Code generated by cmd/cgo -godefs; DO NOT EDIT.
++// cgo -godefs types.go
++
++// +build riscv riscv64
++
++package pty
++
++type (
++	_C_int  int32
++	_C_uint uint32
++)
+diff --git a/vendor/github.com/kr/pty/ztypes_s390x.go b/vendor/github.com/creack/pty/ztypes_s390x.go
+similarity index 100%
+rename from vendor/github.com/kr/pty/ztypes_s390x.go
+rename to vendor/github.com/creack/pty/ztypes_s390x.go
+diff --git a/vendor/github.com/kr/pty/run.go b/vendor/github.com/kr/pty/run.go
+deleted file mode 100644
+index baecca8af934..000000000000
+--- a/vendor/github.com/kr/pty/run.go
++++ /dev/null
+@@ -1,34 +0,0 @@
+-// +build !windows
+-
+-package pty
+-
+-import (
+-	"os"
+-	"os/exec"
+-	"syscall"
+-)
+-
+-// Start assigns a pseudo-terminal tty os.File to c.Stdin, c.Stdout,
+-// and c.Stderr, calls c.Start, and returns the File of the tty's
+-// corresponding pty.
+-func Start(c *exec.Cmd) (pty *os.File, err error) {
+-	pty, tty, err := Open()
+-	if err != nil {
+-		return nil, err
+-	}
+-	defer tty.Close()
+-	c.Stdout = tty
+-	c.Stdin = tty
+-	c.Stderr = tty
+-	if c.SysProcAttr == nil {
+-		c.SysProcAttr = &syscall.SysProcAttr{}
+-	}
+-	c.SysProcAttr.Setctty = true
+-	c.SysProcAttr.Setsid = true
+-	err = c.Start()
+-	if err != nil {
+-		pty.Close()
+-		return nil, err
+-	}
+-	return pty, err
+-}
+diff --git a/vendor/github.com/kr/pty/types.go b/vendor/github.com/kr/pty/types.go
+deleted file mode 100644
+index 5aecb6bcdcb2..000000000000
+--- a/vendor/github.com/kr/pty/types.go
++++ /dev/null
+@@ -1,10 +0,0 @@
+-// +build ignore
+-
+-package pty
+-
+-import "C"
+-
+-type (
+-	_C_int  C.int
+-	_C_uint C.uint
+-)
+diff --git a/vendor/github.com/kr/pty/types_dragonfly.go b/vendor/github.com/kr/pty/types_dragonfly.go
+deleted file mode 100644
+index 5c0493b85175..000000000000
+--- a/vendor/github.com/kr/pty/types_dragonfly.go
++++ /dev/null
+@@ -1,17 +0,0 @@
+-// +build ignore
+-
+-package pty
+-
+-/*
+-#define _KERNEL
+-#include <sys/conf.h>
+-#include <sys/param.h>
+-#include <sys/filio.h>
+-*/
+-import "C"
+-
+-const (
+-	_C_SPECNAMELEN = C.SPECNAMELEN /* max length of devicename */
+-)
+-
+-type fiodgnameArg C.struct_fiodname_args
+diff --git a/vendor/github.com/kr/pty/types_freebsd.go b/vendor/github.com/kr/pty/types_freebsd.go
+deleted file mode 100644
+index ce3eb9518109..000000000000
+--- a/vendor/github.com/kr/pty/types_freebsd.go
++++ /dev/null
+@@ -1,15 +0,0 @@
+-// +build ignore
+-
+-package pty
+-
+-/*
+-#include <sys/param.h>
+-#include <sys/filio.h>
+-*/
+-import "C"
+-
+-const (
+-	_C_SPECNAMELEN = C.SPECNAMELEN /* max length of devicename */
+-)
+-
+-type fiodgnameArg C.struct_fiodgname_arg
+-- 
+2.29.2
+

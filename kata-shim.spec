@@ -4,7 +4,7 @@
 #
 Name     : kata-shim
 Version  : 1.10.0
-Release  : 24
+Release  : 26
 URL      : https://github.com/kata-containers/shim/archive/1.10.0/shim-1.10.0.tar.gz
 Source0  : https://github.com/kata-containers/shim/archive/1.10.0/shim-1.10.0.tar.gz
 Summary  : No detailed summary available
@@ -14,6 +14,7 @@ Requires: kata-shim-libexec = %{version}-%{release}
 Requires: kata-shim-license = %{version}-%{release}
 BuildRequires : buildreq-golang
 Patch1: 0001-add-fake-autogen.patch
+Patch2: 0001-Switch-to-creack.patch
 
 %description
 [![Build Status](https://travis-ci.org/kata-containers/shim.svg?branch=master)](https://travis-ci.org/kata-containers/shim)
@@ -40,17 +41,18 @@ license components for the kata-shim package.
 %setup -q -n shim-1.10.0
 cd %{_builddir}/shim-1.10.0
 %patch1 -p1
+%patch2 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1580840956
+export SOURCE_DATE_EPOCH=1605307703
 export GCC_IGNORE_WERROR=1
 export CFLAGS="$CFLAGS -fno-lto "
-export FCFLAGS="$CFLAGS -fno-lto "
-export FFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$FFLAGS -fno-lto "
+export FFLAGS="$FFLAGS -fno-lto "
 export CXXFLAGS="$CXXFLAGS -fno-lto "
 %autogen --disable-static ;export GOPATH="${PWD}/gopath/" \
 ;mkdir -p "${GOPATH}/src/github.com/kata-containers/" \
@@ -59,7 +61,7 @@ export CXXFLAGS="$CXXFLAGS -fno-lto "
 make  %{?_smp_mflags}
 
 %install
-export SOURCE_DATE_EPOCH=1580840956
+export SOURCE_DATE_EPOCH=1605307703
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/kata-shim
 cp %{_builddir}/shim-1.10.0/LICENSE %{buildroot}/usr/share/package-licenses/kata-shim/7df059597099bb7dcf25d2a9aedfaf4465f72d8d
