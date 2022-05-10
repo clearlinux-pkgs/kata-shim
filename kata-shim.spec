@@ -4,7 +4,7 @@
 #
 Name     : kata-shim
 Version  : 1.10.8
-Release  : 45
+Release  : 46
 URL      : https://github.com/kata-containers/shim/archive/1.10.8/shim-1.10.8.tar.gz
 Source0  : https://github.com/kata-containers/shim/archive/1.10.8/shim-1.10.8.tar.gz
 Summary  : No detailed summary available
